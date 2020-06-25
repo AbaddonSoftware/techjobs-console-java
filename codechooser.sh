@@ -34,6 +34,6 @@ done
 echo ""
 echo "Enter a number to test the code"
 read INDEX
-clear ; cd out/repl.it/ ; java ${Classes[$INDEX-1]}
+clear ; cd out/repl.it/ ; java -cp .:lib/commons-csv-1.4.jar ${Classes[$INDEX-1]}
 
 

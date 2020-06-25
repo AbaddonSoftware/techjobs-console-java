@@ -23,7 +23,7 @@ if [ "${RESPONSE,,}" = "y" ] || [ "${RESPONSE,,}" = "yes" ]; then
   cp lib/* out/repl.it/lib
   cp resources/job_data.csv out/repl.it/resources/
   find -name "*.java" > sources
-  javac -cp out/repl.it/lib/commons-csv-1.4.jar -d out/repl.it @sources
+  javac -d out/repl.it -cp .:lib/commons-csv-1.4.jar @sources
   echo "this directory and subdirectories may be deleted as it's only useful when running code on repl.it" > out/repl.it/youcandelete.me
   rm sources
 
