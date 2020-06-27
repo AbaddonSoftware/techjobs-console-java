@@ -23,18 +23,6 @@ public class JobData {
 
 
 
-    public static ArrayList<HashMap<String, String>> findByValue(String value) {
-        loadData();
-        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
-        for (HashMap<String, String> row : allJobs) {
-            row.entrySet().forEach(element->{
-                if (element.getValue().toLowerCase().contains(value.toLowerCase()) && !jobs.contains(row)) {
-                    jobs.add(row);
-                }  });
-        }
-        return jobs;
-    }
-
     /**
      * Fetch list of all values from loaded data,
      * without duplicates, for a given column.
@@ -65,8 +53,7 @@ public class JobData {
 
         // load data, if not already loaded
         loadData();
-
-        return (ArrayList) allJobs.clone();
+        return new ArrayList<>(allJobs);
     }
 
     /**
@@ -76,8 +63,8 @@ public class JobData {
      * For example, searching for employer "Enterprise" will include results
      * with "Enterprise Holdings, Inc".
      *
-     * @param column   Column that should be searched.
-     * @param value Value of teh field to search for
+     * @param column Column that should be searched.
+     * @param value Value to search for
      * @return List of all jobs matching the criteria
      */
     public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
@@ -96,6 +83,29 @@ public class JobData {
             }
         }
 
+        return jobs;
+    }
+
+    /**
+     * Return list of all jobs from loaded data,
+     * without duplicates, which contain a given
+     * search value.
+     *
+     * @param value the value to search for in each job
+     * @return List of all jobs matching the criteria
+     */
+
+    public static ArrayList<HashMap<String, String>> findByValue(String value) {
+        loadData();
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+        for (HashMap<String, String> row : allJobs) {
+            //System.out.println(row);
+            row.values().forEach( element ->{
+                if (element.toLowerCase().contains(value.toLowerCase()) && !jobs.contains(row)) {
+                    jobs.add(row);
+                }
+            });
+        }
         return jobs;
     }
 

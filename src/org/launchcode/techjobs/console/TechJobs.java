@@ -1,9 +1,6 @@
 package org.launchcode.techjobs.console;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by LaunchCode
@@ -13,68 +10,71 @@ public class TechJobs {
     private static Scanner in = new Scanner(System.in);
 
     public static void main (String[] args) {
+        String searchTerm;
+        Boolean searching = true;
 
         // Initialize our field map with key/name pairs
-        HashMap<String, String> columnChoices = new HashMap<>();
+        LinkedHashMap<String, String> columnChoices = new LinkedHashMap<>();
         columnChoices.put("core competency", "Skill");
         columnChoices.put("employer", "Employer");
         columnChoices.put("location", "Location");
         columnChoices.put("position type", "Position Type");
-        columnChoices.put("all", "All");
+//        columnChoices.put("all", "All");
 
         // Top-level menu options
-        HashMap<String, String> actionChoices = new HashMap<>();
-        actionChoices.put("search", "Search");
-        actionChoices.put("list", "List");
+        LinkedHashMap<String, String> actionChoices = new LinkedHashMap<>();
+        actionChoices.put("search all", "Search All");
+        actionChoices.put("search by category", "Search By Category");
+        actionChoices.put("list all", "List All");
+        actionChoices.put("list by category", "List By Category");
+        actionChoices.put("exit the system", "Exit The System");
 
         System.out.println("Welcome to LaunchCode's TechJobs App!");
 
         // Allow the user to search until they manually quit
-        while (true) {
+        while (searching) {
 
             String actionChoice = getUserSelection("View jobs by:", actionChoices);
 
-            if (actionChoice.equals("list")) {
-
-                String columnChoice = getUserSelection("List", columnChoices);
-
-                if (columnChoice.equals("all")) {
+            switch(actionChoice) {
+                case "list all":
                     printJobs(JobData.findAll());
-                } else {
-
+                    break;
+                case "list by category":
+                    String columnChoice = getUserSelection("List", columnChoices);
                     ArrayList<String> results = JobData.findAll(columnChoice);
                     results.sort(Comparator.comparing(String::toLowerCase));
-
                     System.out.println("\n*** All " + columnChoices.get(columnChoice) + " Values ***");
-
                     // Print list of skills, employers, etc
-                    for (String item : results) {
-                        System.out.println(item);
-                    }
-                }
-
-            } else { // choice is "search"
-
-                // How does the user want to search (e.g. by skill or employer)
-                String searchField = getUserSelection("Search by:", columnChoices);
-
-                // What is their search term?
-                System.out.println("\nSearch term: ");
-                String searchTerm = in.nextLine();
-
-                if (searchField.equals("all")) {
+                    results.forEach(item -> { System.out.println(item); } );
+                    break;
+                case "search all":
+                    searchTerm = getUserSelection("\nSearch Term: ");
                     printJobs(JobData.findByValue(searchTerm));
-                } else {
+                    break;
+                case "search by category":
+                    String searchField = getUserSelection("Search by:", columnChoices);
+                    searchTerm = getUserSelection("\nSearch Term: ");
                     printJobs(JobData.findByColumnAndValue(searchField, searchTerm));
-                }
+                    break;
+                case "exit the system":
+                    searching = false;
+                    break;
+                default:
+                    System.out.println("Feature not yet implemented");
+                    break;
             }
         }
     }
 
+    private static String getUserSelection(String query) {
+        System.out.println(query);
+        String userResponse = in.nextLine();
+        return userResponse;
+    }
     // ﻿Returns the key of the selected item from the choices Dictionary
-    private static String getUserSelection(String menuHeader, HashMap<String, String> choices) {
-
-        Integer choiceIdx;
+    private static String getUserSelection(String menuHeader, LinkedHashMap<String, String> choices) {
+        Integer choiceIdx = -1;
         Boolean validChoice = false;
         String[] choiceKeys = new String[choices.size()];
 
@@ -95,14 +95,18 @@ public class TechJobs {
                 System.out.println("" + j + " - " + choices.get(choiceKeys[j]));
             }
 
-            choiceIdx = in.nextInt();
-            in.nextLine();
+            try {
+                choiceIdx = in.nextInt();
+            }
+            catch (InputMismatchException error) {
+                System.out.println(error.toString()+ " occurred but no need to let that ruin our day.");
+            }
 
+            in.nextLine();
             // Validate user's input
-            if (choiceIdx < 0 || choiceIdx >= choiceKeys.length) {
-                System.out.println("Invalid choice. Try again.");
-            } else {
-                validChoice = true;
+            validChoice = choiceIdx >= 0 && choiceIdx < choiceKeys.length;
+            if(!validChoice) {
+                System.out.println("Invalid choice, Try again.");
             }
 
         } while(!validChoice);
@@ -114,7 +118,7 @@ public class TechJobs {
     private static void printJobs(ArrayList<HashMap<String, String>> someJobs) {
         if (someJobs.isEmpty())
         {
-            System.out.println("No results");
+            System.out.println("No results found.");
         }
         else
         {
