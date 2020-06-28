@@ -11,7 +11,7 @@ public class TechJobs {
 
     public static void main (String[] args) {
         String searchTerm;
-        Boolean searching = true;
+        boolean searching = true;
 
         // Initialize our field map with key/name pairs
         LinkedHashMap<String, String> columnChoices = new LinkedHashMap<>();
@@ -46,15 +46,15 @@ public class TechJobs {
                     results.sort(Comparator.comparing(String::toLowerCase));
                     System.out.println("\n*** All " + columnChoices.get(columnChoice) + " Values ***");
                     // Print list of skills, employers, etc
-                    results.forEach(item -> { System.out.println(item); } );
+                    results.forEach(System.out::println);
                     break;
                 case "search all":
-                    searchTerm = getUserSelection("\nSearch Term: ");
+                    searchTerm = queryUser("\nSearch Term: ");
                     printJobs(JobData.findByValue(searchTerm));
                     break;
                 case "search by category":
                     String searchField = getUserSelection("Search by:", columnChoices);
-                    searchTerm = getUserSelection("\nSearch Term: ");
+                    searchTerm = queryUser("\nSearch Term: ");
                     printJobs(JobData.findByColumnAndValue(searchField, searchTerm));
                     break;
                 case "exit the system":
@@ -67,50 +67,38 @@ public class TechJobs {
         }
     }
 
-    private static String getUserSelection(String query) {
+    private static String queryUser(String query) {
         System.out.println(query);
-        String userResponse = in.nextLine();
-        return userResponse;
+        return in.nextLine();
     }
     // ﻿Returns the key of the selected item from the choices Dictionary
     private static String getUserSelection(String menuHeader, LinkedHashMap<String, String> choices) {
-        Integer choiceIdx = -1;
-        Boolean validChoice = false;
+        int choiceIdx = -1;
+        boolean validChoice;
         String[] choiceKeys = new String[choices.size()];
 
-        // Put the choices in an ordered structure so we can
-        // associate an integer with each one
-        Integer i = 0;
-        for (String choiceKey : choices.keySet()) {
-            choiceKeys[i] = choiceKey;
-            i++;
-        }
 
         do {
-
             System.out.println("\n" + menuHeader);
 
-            // Print available choices
-            for (Integer j = 0; j < choiceKeys.length; j++) {
-                System.out.println("" + j + " - " + choices.get(choiceKeys[j]));
+            for (int optionNumber = 0; optionNumber < choiceKeys.length; optionNumber++) {
+                choiceKeys[optionNumber] = (String) choices.keySet().toArray()[optionNumber];
+                System.out.println("" + optionNumber + " - " + choices.get(choiceKeys[optionNumber]));
             }
 
             try {
                 choiceIdx = in.nextInt();
             }
             catch (InputMismatchException error) {
-                System.out.println(error.toString()+ " occurred but no need to let that ruin our day.");
+                System.out.println(error.toString()+ " occurred but no need to let that ruin our day... maybe.");
             }
 
             in.nextLine();
-            // Validate user's input
-            validChoice = choiceIdx >= 0 && choiceIdx < choiceKeys.length;
+            validChoice = choiceIdx >= 0 && choiceIdx < choices.size();
             if(!validChoice) {
                 System.out.println("Invalid choice, Try again.");
             }
-
         } while(!validChoice);
-
         return choiceKeys[choiceIdx];
     }
 
@@ -124,8 +112,7 @@ public class TechJobs {
         {
             for (HashMap<String, String> resultMap : someJobs) {
                 System.out.println("*****");
-                resultMap.entrySet().forEach(
-                        element->{ System.out.println(element.getKey()+ ": " + element.getValue()); });
+                resultMap.forEach((key, value) -> System.out.println(key + ": " + value));
                 System.out.println("*****\n");
             }
         }
